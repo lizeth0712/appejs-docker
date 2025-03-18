@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="cliente.css" />
+  <title>Cliente</title>
+</head>
+<body>
+  <!-- Barra superior -->
+  <header class="top-bar">
+    <nav class="nav-bar">
+      <a href="#">Create New Test Requests</a>
+      <a href="#">Test Requests</a>
+    </nav>
+    <div class="user-info">
+      <span>Hello, Lizeth</span>
+      <a href="#" class="logout">LOGOUT</a>
+    </div>
+  </header>
+
+  <!-- Contenedor -->
+  <div class="container">
+    <!-- buscador -->
+    <section class="search-bar">
+      <h2>Laboratory Managements - Test Requests Created</h2>
+      <div class="search-group">
+        <input type="text" placeholder="Search..." />
+        <button>Search</button>
+      </div>
+    </section>
+
+    <!-- Tabla -->
+    <section class="table-section">
+      <table>
+        <thead>
+          <tr>
+            <th>Test Request Name</th>
+            <th>Goal of request</th>
+            <th>Start</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>TR-2024-313</td>
+            <td>Inners validation</td>
+            <td>01/30/2025 11:40 AM</td>
+            <td class="status approved">APPROVED</td>
+            <td>
+              <button class="edit-btn">Edit</button>
+              <button class="delete-btn">Delete</button>
+            </td>
+          </tr>
+          <tr>
+            <td>TR-2024-312</td>
+            <td>Inners validation</td>
+            <td>01/31/2025 12:35 PM</td>
+            <td class="status open">OPEN</td>
+            <td>
+              <button class="edit-btn">Edit</button>
+              <button class="delete-btn">Delete</button>
+            </td>
+          </tr>
+          <tr>
+            <td>TR-2024-311</td>
+            <td>Jacket validation</td>
+            <td>01/31/2025 05:25 PM</td>
+            <td class="status approved">APPROVED</td>
+            <td>
+              <button class="edit-btn">Edit</button>
+              <button class="delete-btn">Delete</button>
+            </td>
+          </tr>
+          <tr>
+            <td>TR-2024-310</td>
+            <td>Inners validation</td>
+            <td>02/01/2025 08:36 AM</td>
+            <td class="status approved">APPROVED</td>
+            <td>
+              <button class="edit-btn">Edit</button>
+              <button class="delete-btn">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
+</body>
+</html>
