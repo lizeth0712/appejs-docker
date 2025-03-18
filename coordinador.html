@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="coordinador.css" />
+  <title>Coordinador</title>
+</head>
+<body>
+  <div class="container">
+    <!-- Barra lateral -->
+    <aside class="sidebar">
+      <h2>Details</h2>
+      <!--Buscador-->
+      <div class="search-group">
+        <input type="text" placeholder="Name..." />
+        <button>Search</button>
+      </div>
+      <ul class="requests">
+        <li>TR-2024-317<br /><small>Rec. Date: 01-30-2025</small></li>
+        <li>TR-2024-318<br /><small>Rec. Date: 01-30-2025</small></li>
+        <li>TR-2024-319<br /><small>Rec. Date: 01-30-2025</small></li>
+      </ul>
+    </aside>
+
+    <!-- Main -->
+    <main class="content">
+      <header class="header">
+        <span>Hello, Lizeth</span>
+        <a href="#" class="logout">LOGOUT</a>
+      </header>
+
+      <section class="general-info">
+        <h2>General information</h2>
+        <div class="info-grid">
+          <div><strong>Test Request name:</strong> TR-2024-317</div>
+          <div><strong>Plant:</strong> COFCJ</div>
+          <div><strong>Requestor:</strong> Lizeth Soto</div>
+          <div><strong>Requested Date:</strong> 01-30-2025</div>
+        </div>
+      </section>
+
+      <section class="wire-info">
+        <h3>Wire information</h3>
+        <div class="goal">Goal of the test request: <strong>Inners validation</strong></div>
+        <div class="wire-grid">
+          <div><strong>Temperature range:</strong> -40C a 105C</div>
+          <div><strong>Voltage range:</strong> 60V</div>
+          <div><strong>Family:</strong> FLY</div>
+          <div><strong>Insulation:</strong> PVC</div>
+          <div><strong>Compound:</strong> FLY</div>
+          <div><strong>Cross section:</strong> 0,50 mm</div>
+          <div><strong>Color:</strong> WH</div>
+        </div>
+      </section>
+
+      <section class="standard">
+        <h3>Standard</h3>
+        <div>ISO 19642-3</div>
+      </section>
+
+      <section class="test">
+        <h3>Test</h3>
+        <ul>
+          <li>5.2.1 Cable Outside Diameter</li>
+          <li>5.3.3 Withstand Voltage</li>
+          <li>5.4.4 Cyclic Bending</li>
+        </ul>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
