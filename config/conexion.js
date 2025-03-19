@@ -14,5 +14,13 @@ const dbSetting = {
     charset: 'utf8mb4',
     waitForConnection: true,
     connectionLimit: 10,
-
+    queueLimit: 0
 }
+
+const pool = mysql.createPool(dbSetting)
+
+module.exports =  {pool}
+
+console.log("Usuario: ", process.env.DB_USER);
+console.log("Contrasena: ", process.env.DB_PASS);
+console.log("Base de datos: ", process.env.DB_NAME);

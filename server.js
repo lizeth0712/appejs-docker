@@ -1,8 +1,14 @@
 // Configuracion de servidor
 const express = require("express");
 const app = express();
+const dotenv = require("dotenv");
 //Configurar el puerto
 const port =3000;
+
+
+//VARIABLES DE ENTORNO
+
+dotenv.config()
  
 //Configuracion para motor de plantillas EJS res.render("archivo")
 app.set("view engine", "ejs");
