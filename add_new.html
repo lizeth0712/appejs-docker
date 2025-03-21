@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="add.css" />
+  <title>Create New Test Request</title>
+</head>
+<body>
+  <!-- Barra superior -->
+  <header class="top-bar">
+    <nav>
+      <a href="#">Create New Test Requests</a>
+      <a href="#">Test Requests</a>
+    </nav>
+    <div class="user-info">
+      <span>Hello, Lizeth</span>
+      <a href="#" class="logout">LOGOUT</a>
+    </div>
+  </header>
+
+  <!-- Container -->
+  <div class="container">
+    <h2>Create New Test Request</h2>
+
+    <!-- Plant -->
+    <section class="section">
+      <label>*Plant</label>
+      <select>
+        <option>Select an option</option>
+        <option>Plant A</option>
+        <option>Plant B</option>
+      </select>
+    </section>
+
+    <!-- Wire Information -->
+    <section class="section">
+      <h3>Wire Information</h3>
+      <label>*Goal of the test request</label>
+      <input type="text" placeholder="Goal of request" />
+
+      <div class="wire-info-grid">
+        <div>
+          <label>*Temperature range:</label>
+          <input type="text" />
+        </div>
+        <div>
+          <label>*Voltage range:</label>
+          <input type="text" />
+        </div>
+        <div>
+          <label>*Family:</label>
+          <input type="text" />
+        </div>
+        <div>
+          <label>*Insulation:</label>
+          <input type="text" />
+        </div>
+        <div>
+          <label>*Compound:</label>
+          <input type="text" />
+        </div>
+        <div>
+          <label>*Cross section:</label>
+          <input type="text" />
+        </div>
+        <div>
+          <label>*Color:</label>
+          <input type="text" />
+        </div>
+      </div>
+    </section>
+
+    <!-- Detail Test -->
+    <section class="section">
+      <h3>Detail Test</h3>
+      <select>
+        <option>Select Standard</option>
+        <option>ISO 18443-2</option>
+        <option>ISO 17025</option>
+      </select>
+      <select>
+        <option>Select Test</option>
+        <option>5.2.1 Cable Outside Diameter</option>
+        <option>5.2.2 Insulation Thickness</option>
+      </select>
+    </section>
+  </div>
+</body>
+</html>
