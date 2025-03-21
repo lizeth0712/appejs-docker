@@ -26,6 +26,18 @@ app.get("/",(req, res) =>{
 app.get("/about",(req,res)=>{
     res.render("about",{titulo:"Acerca de Nosotros"})
 })
+
+app.get("/cliente",(req,res)=>{
+    res.render("cliente",{titulo:"Cliente"})
+})
+
+app.get("/coordinador",(req,res)=>{
+    res.render("coordinador",{titulo:"Coordinador"})
+})
+
+app.get("/login",(req,res)=>{
+    res.render("login",{titulo:"Inicio de sesion "})
+})
  
 //Ruta Para el manejo de errores
 app.use((req,res)=>{
