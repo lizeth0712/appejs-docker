@@ -1,0 +1,138 @@
+/* Es tilos generales */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  /* barrra superior */
+  .top-bar {
+    background-color: #e0e0e0;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  .user-info span {
+    margin-right: 10px;
+  }
+  
+  .logout {
+    color: #001f87;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+  /* Container */
+  .container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 2fr;
+    gap: 20px;
+    padding: 20px;
+  }
+  
+  /* Test Request, Test Selection */
+  .test-request-section,
+  .test-selection-section {
+    background-color: #ffffff;
+    padding: 15px;
+    border: 1px solid #ccc;
+  }
+  
+  h3 {
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+  
+  .search-box {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .test-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .test-list li {
+    padding: 10px;
+    background-color: #e0e0e0;
+    margin-bottom: 5px;
+    cursor: pointer;
+  }
+  
+  .test-list li:hover {
+    background-color: #c2e3fc;
+  }
+  
+  /* Datos */
+  .data-section {
+    background-color: #ffffff;
+    padding: 15px;
+    border: 1px solid #ccc;
+  }
+  
+  .environment-data {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .environment-data label {
+    font-weight: bold;
+  }
+  
+  .environment-data input {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  /* Tabla */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+  
+  th, td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: center;
+  }
+  
+  th {
+    background-color: #f0f0f0;
+  }
+  
+  /* Boton */
+  .save-btn {
+    background-color: #001f87;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  
+  .save-btn:hover {
+    background-color: #000c66;
+  }
+  
+  /* Responsivo */
+  @media (max-width: 768px) {
+    .container {
+      grid-template-columns: 1fr;
+    }
+  
+    .environment-data {
+      flex-direction: column;
+    }
+  }
+  
