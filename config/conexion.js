@@ -1,25 +1,28 @@
-//importar la version de promise de MYSQL2
-const mysql = require('mysql2/promise')
+// importar la versión de promise de MYSQL2
+const mysql = require('mysql2/promise');
 
-//jalar variables
-const dotenv = require('dotenv')
+// cargar variables de entorno desde la raíz
+const path = require('path');
+const dotenv = require('dotenv');
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
-dotenv.config();
+// configuración de conexión
 const dbSetting = {
-    host: 'localhost',
+    host: process.env.DB_HOST || 'localhost',
     user: process.env.DB_USER,
     password: process.env.DB_PASS,
     database: process.env.DB_NAME, 
-    port: 3306,
+    port: process.env.DB_PORT || 3306,
     charset: 'utf8mb4',
-    waitForConnection: true,
     connectionLimit: 10,
     queueLimit: 0
-}
+};
 
-const pool = mysql.createPool(dbSetting)
+// crear el pool de conexiones
+const pool = mysql.createPool(dbSetting);
 
-module.exports =  {pool}
+// exportar el pool
+module.exports = { pool };
 
 console.log("Usuario: ", process.env.DB_USER);
 console.log("Contrasena: ", process.env.DB_PASS);
