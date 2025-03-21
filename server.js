@@ -38,7 +38,14 @@ app.get("/coordinador",(req,res)=>{
 app.get("/login",(req,res)=>{
     res.render("login",{titulo:"Inicio de sesion "})
 })
+
+app.get("/tecnico",(req,res)=>{
+    res.render("tecnico",{titulo:"Tecnico "})
+})
  
+app.get("/add_new",(req,res)=>{
+    res.render("add_new",{titulo:"Agregar "})
+})
 //Ruta Para el manejo de errores
 app.use((req,res)=>{
     res.status(404).render("404",{titulo:"Pagina no encontrada"});
