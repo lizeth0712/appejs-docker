@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/css/add.css" />
+  <link rel="icon" type="image/png" href="/img/cofilogo.ico">
+  <title>Create New Test Request</title>
+</head>
+<body>
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-dark">
+    <div class="containerNavBar">
+        <a href="#" class="navbar-brand">
+            <img src="img/logo.png" alt="Coficab Logo" width="120">
+        </a>
+        <div>
+          <a href="add_new">Create New Test Request</a>
+          <a href="cliente">Test Request</a>
+          <span>Hello, <%= nombre %></span>
+            <a href="/logout" >LOGOUT</a>
+        </div>
+    </div>
+  </nav>
+  <div class="container">
+    <h2>Create New Test Request</h2>
+  
+    <!-- Formulario para editar solicitud -->
+    <form action="/edit/<%= solicitud.ID %>" method="POST">
+        <!-- Plant -->
+        <section class="section">
+          <label>*Plant</label>
+          <select name="planta" required>
+            <option <%= solicitud.planta === 'Plant A' ? 'selected' : '' %>>Plant A</option>
+            <option <%= solicitud.planta === 'Plant B' ? 'selected' : '' %>>Plant B</option>
+          </select>
+        </section>
+      
+        <!-- Wire Information -->
+        <section class="section">
+          <h3>Wire Information</h3>
+          <label>*Goal of the test request</label>
+          <input type="text" name="meta" value="<%= solicitud.meta %>" required />
+      
+          <div class="wire-info-grid">
+            <div>
+              <label>*Family:</label>
+              <input type="text" name="familia" value="<%= solicitud.familia %>" required />
+            </div>
+            <div>
+              <label>*Cross section:</label>
+              <input type="text" name="calibre" value="<%= solicitud.calibre %>" required />
+            </div>
+            <div>
+              <label>*Color:</label>
+              <input type="text" name="color" value="<%= solicitud.color %>" required />
+            </div>
+          </div>
+        </section>
+      
+        <!-- Detail Test -->
+        <section class="section">
+          <h3>Detail Test</h3>
+          <select name="standar" required>
+            <option <%= solicitud.standar === 'UL 758' ? 'selected' : '' %>>UL 758</option>
+            <option <%= solicitud.standar === 'ISO 17025' ? 'selected' : '' %>>ISO 17025</option>
+          </select>
+          <select name="tipo_prueba" required>
+            <option <%= solicitud.tipo_prueba === 'VW-1 Flame Test' ? 'selected' : '' %>>VW-1 Flame Test</option>
+            <option <%= solicitud.tipo_prueba === '5.2.1 Cable Outside Diameter' ? 'selected' : '' %>>5.2.1 Cable Outside Diameter</option>
+            <option <%= solicitud.tipo_prueba === '5.2.2 Insulation Thickness' ? 'selected' : '' %>>5.2.2 Insulation Thickness</option>
+          </select>
+        </section>
+      
+        <button type="submit" class="edit-btn">Update Test Request</button>
+      </form>
+      
+  </div>
+  
+</body>
+</html>
