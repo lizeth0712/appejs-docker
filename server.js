@@ -39,11 +39,17 @@ app.set("view engine", "ejs");
 
 // Login
 app.get("/", (req, res) => {
-    res.render("login", { titulo: "Inicio de sesión", error: null });
+    const error = req.session.errorLogin || null;
+    delete req.session.errorLogin;
+
+    res.render("login", { titulo: "Inicio de sesión", error });
 });
 
+
+// Ruta para procesar login
 app.post("/login", async (req, res) => {
     const { userType, username, password } = req.body;
+
     try {
         const [rows] = await pool.query(
             "SELECT * FROM users WHERE correo = ? AND contra = ? AND rol = ?",
@@ -52,6 +58,7 @@ app.post("/login", async (req, res) => {
 
         if (rows.length > 0) {
             const user = rows[0];
+
             req.session.user = {
                 id: user.ID,
                 nombre: user.nombre,
@@ -63,13 +70,15 @@ app.post("/login", async (req, res) => {
             if (user.rol === 'coordinador') return res.redirect('/coordinador');
             if (user.rol === 'tecnico') return res.redirect('/tecnico');
         } else {
-            res.render("login", { titulo: "Inicio de sesión", error: "Usuario o contraseña incorrectos" });
+            req.session.errorLogin = "User or password incorrect";
+            return res.redirect('/');
         }
     } catch (error) {
         console.error("Error en login:", error);
         res.status(500).send("Error en el servidor");
     }
 });
+
 
 // Logout
 app.get("/logout", (req, res) => {
@@ -121,15 +130,56 @@ app.get("/cliente", async (req, res) => {
 
 
 // Coordinador
-app.get("/coordinador", (req, res) => {
+app.get("/coordinador", async (req, res) => {
     if (!req.session.user || req.session.user.rol !== 'coordinador') {
         return res.redirect('/');
     }
-    res.render("coordinador", {
-        titulo: "Coordinador",
-        nombre: req.session.user.nombre
-    });
+
+    const selectedId = req.query.id;
+    const searchTerm = req.query.buscar;
+    const mensaje = req.session.mensaje || null;
+    delete req.session.mensaje;
+    try {
+        let solicitudes;
+
+        if (searchTerm) {
+            const query = `
+                SELECT * FROM test_requests 
+                WHERE ID LIKE ? OR solicitante LIKE ? 
+                ORDER BY fecha_creacion DESC
+            `;
+            const likeTerm = `%${searchTerm}%`;
+            const [result] = await pool.query(query, [likeTerm, likeTerm]);
+            solicitudes = result;
+        } else {
+            const [result] = await pool.query("SELECT * FROM test_requests ORDER BY fecha_creacion DESC");
+            solicitudes = result;
+        }
+
+        // Ver cuál mostrar a la derecha
+        let solicitudSeleccionada = null;
+        if (selectedId) {
+            const [result] = await pool.query("SELECT * FROM test_requests WHERE ID = ?", [selectedId]);
+            if (result.length > 0) solicitudSeleccionada = result[0];
+        }
+
+       
+        res.render("coordinador", {
+            titulo: "Coordinador",
+            nombre: req.session.user.nombre,
+            solicitudes,
+            seleccionada: solicitudSeleccionada,
+            mensaje
+        });
+
+    } catch (error) {
+        console.error(" Error:", error.message);
+        res.status(500).send("Error en el servidor");
+    }
 });
+
+
+
 
 // Técnico
 app.get("/tecnico", (req, res) => {
@@ -261,6 +311,35 @@ app.post("/delete/:id", async (req, res) => {
         res.status(500).send("Error al eliminar la solicitud");
     }
 });
+
+
+
+//ESTATUS DESDE COORDINADOR 
+app.post("/coordinador/estatus/:id", async (req, res) => {
+    if (!req.session.user || req.session.user.rol !== 'coordinador') {
+        return res.redirect('/');
+    }
+
+    const solicitudId = req.params.id;
+    const nuevoEstatus = req.body.estatus;
+
+    try {
+        await pool.query(
+            "UPDATE test_requests SET estatus = ? WHERE ID = ?",
+            [nuevoEstatus, solicitudId]
+        );
+
+        // Guardar mensaje en sesión
+        req.session.mensaje = `El estatus de la solicitud TR-${solicitudId} fue actualizado a "${nuevoEstatus.toUpperCase()}".`;
+
+        res.redirect("/coordinador?id=" + solicitudId); // volver a la misma solicitud
+
+    } catch (error) {
+        console.error("❌ Error al actualizar estatus:", error.message);
+        res.status(500).send("Error al actualizar estatus");
+    }
+});
+
 
 // Página About
 app.get("/about", (req, res) => {

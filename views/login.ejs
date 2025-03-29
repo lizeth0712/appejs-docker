@@ -68,9 +68,25 @@
                 <label for="password" class="form-label">Password</label>
                 <input type="password" class="form-control" id="password" name="password" required>
             </div>
+            <% if (error) { %>
+                <div class="alert alert-danger text-center" role="alert">
+                  <%= error %>
+                </div>
+              <% } %>
+              
             <button type="submit" class="btn btn-primary">Login</button>
         </form>
     </div>
-
+    <script>
+        const errorBox = document.querySelector('.alert');
+      
+        if (errorBox) {
+          setTimeout(() => {
+            // Redireccionar al mismo login limpio
+            window.location.href = "/";
+          }, 3000);
+        }
+      </script>
+      
 </body>
 </html>
