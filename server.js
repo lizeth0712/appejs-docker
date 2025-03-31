@@ -3,6 +3,7 @@ const express = require("express");
 const app = express();
 const dotenv = require("dotenv");
 const session = require("express-session");
+const mongoose = require("mongoose");
 const { pool } = require('./config/conexion');
 
 const port = 3000;
@@ -10,28 +11,34 @@ const port = 3000;
 // Cargar variables de entorno
 dotenv.config();
 
+// Conectar a MongoDB Atlas
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log("Conectado a MongoOO"))
+  .catch(err => console.error("❌ Error de conexión a MongoDB:", err.message));
+
 // Middlewares
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 app.use(express.static("public"));
 
 app.use(session({
-    secret: 'secreto-super-seguro',
-    resave: false,
-    saveUninitialized: false,
-    cookie: { maxAge: 5 * 60 * 1000 }
+  secret: 'secreto-super-seguro',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { maxAge: 5 * 60 * 1000 }
 }));
+
 app.use((req, res, next) => {
-    if (req.session) {
-        req.session._garbage = Date();
-        req.session.touch();
-    }
-    next();
+  if (req.session) {
+    req.session._garbage = Date();
+    req.session.touch();
+  }
+  next();
 });
 
-// Middleware global para pasar nombre
 app.use((req, res, next) => {
-    res.locals.nombre = req.session?.user?.nombre || null;
-    next();
+  res.locals.nombre = req.session?.user?.nombre || null;
+  next();
 });
 
 // Motor de plantillas
@@ -162,15 +169,17 @@ app.get("/coordinador", async (req, res) => {
             const [result] = await pool.query("SELECT * FROM test_requests WHERE ID = ?", [selectedId]);
             if (result.length > 0) solicitudSeleccionada = result[0];
         }
-
+        const [tecnicos] = await pool.query("SELECT ID, nombre FROM users WHERE rol = 'tecnico'");
        
         res.render("coordinador", {
             titulo: "Coordinador",
             nombre: req.session.user.nombre,
             solicitudes,
             seleccionada: solicitudSeleccionada,
-            mensaje
+            mensaje,
+            tecnicos
         });
+        
 
     } catch (error) {
         console.error(" Error:", error.message);
@@ -182,15 +191,41 @@ app.get("/coordinador", async (req, res) => {
 
 
 // Técnico
-app.get("/tecnico", (req, res) => {
+app.get("/tecnico", async (req, res) => {
     if (!req.session.user || req.session.user.rol !== 'tecnico') {
-        return res.redirect('/');
+      return res.redirect('/');
     }
-    res.render("tecnico", {
+  
+    const tecnicoId = req.session.user.id;
+  
+    try {
+      const [solicitudes] = await pool.query(
+        "SELECT * FROM test_requests WHERE tecnico_id = ? ORDER BY fecha_creacion DESC",
+        [tecnicoId]
+      );
+  
+      let pruebas = [];
+      if (solicitudes.length > 0) {
+        const selectedRequestId = solicitudes[0].ID;
+        const [result] = await pool.query(
+          "SELECT * FROM test_details WHERE request_id = ?",
+          [selectedRequestId]
+        );
+        pruebas = result;
+      }
+  
+      res.render("tecnico", {
         titulo: "Técnico",
-        nombre: req.session.user.nombre
-    });
-});
+        nombre: req.session.user.nombre,
+        solicitudes,
+        pruebas
+      });
+    } catch (error) {
+      console.error("❌ Error al cargar solicitudes o pruebas:", error.message);
+      res.status(500).send("Error al cargar los datos");
+    }
+  });
+  
 
 // Vista para formulario
 app.get("/add_new", (req, res) => {
@@ -280,7 +315,7 @@ app.post("/edit/:id", async (req, res) => {
 
         res.redirect("/cliente");
     } catch (error) {
-        console.error("❌ Error al actualizar solicitud:", error.message);
+        console.error(" Error al actualizar solicitud:", error.message);
         res.status(500).send("Error al actualizar la solicitud");
     }
 });
@@ -332,14 +367,38 @@ app.post("/coordinador/estatus/:id", async (req, res) => {
         // Guardar mensaje en sesión
         req.session.mensaje = `El estatus de la solicitud TR-${solicitudId} fue actualizado a "${nuevoEstatus.toUpperCase()}".`;
 
-        res.redirect("/coordinador?id=" + solicitudId); // volver a la misma solicitud
+        res.redirect("/coordinador?id=" + solicitudId); 
 
     } catch (error) {
-        console.error("❌ Error al actualizar estatus:", error.message);
+        console.error(" Error al actualizar estatus:", error.message);
         res.status(500).send("Error al actualizar estatus");
     }
 });
+app.post("/coordinador/asignar/:id", async (req, res) => {
+    if (!req.session.user || req.session.user.rol !== 'coordinador') {
+        return res.redirect('/');
+    }
 
+    const solicitudId = req.params.id;
+    const tecnicoId = req.body.tecnico_id;
+
+    try {
+        await pool.query(
+            "UPDATE test_requests SET tecnico_id = ? WHERE ID = ?",
+            [tecnicoId, solicitudId]
+        );
+
+        req.session.mensaje = `✅ Técnico asignado correctamente`;
+        res.redirect(`/coordinador?id=${solicitudId}`);
+    } catch (error) {
+        console.error(" Error al asignar técnico:", error.message);
+        res.status(500).send("Error al asignar técnico");
+    }
+});
+
+
+const tecnicoRoutes = require('./routes/tecnicos');
+app.use(tecnicoRoutes);
 
 // Página About
 app.get("/about", (req, res) => {

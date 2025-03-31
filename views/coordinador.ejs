@@ -97,8 +97,19 @@
         </section>
         <section class="tecnico">
           <h3>Technician</h3>
-           
+          <form action="/coordinador/asignar/<%= seleccionada.ID %>" method="POST">
+            <select name="tecnico_id" required>
+              <option value="">Selecciona un técnico</option>
+              <% tecnicos.forEach(t => { %>
+                <option value="<%= t.ID %>" <%= seleccionada.tecnico_id === t.ID ? 'selected' : '' %>>
+                  <%= t.nombre %>
+                </option>
+              <% }) %>
+            </select>
+            <button type="submit">Asignar</button>
+          </form>
         </section>
+        
       <% } else { %>
         <p style="padding: 2rem;">Select a request to view details.</p>
       <% } %>

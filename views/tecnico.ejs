@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="/css/tecnico.css" />
   <link rel="icon" type="image/png" href="/img/cofilogo.ico">
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
   <title>Tecnico</title>
 </head>
 <body>
@@ -29,11 +30,17 @@
       <h3>Test Request Selection</h3>
       <input type="text" placeholder="Search..." class="search-box" />
       <ul class="test-list">
-        <li>TR-2024-316 <br /><span>Rec. Date: 01-30-2025</span></li>
-        <li>TR-2024-317 <br /><span>Rec. Date: 01-30-2025</span></li>
-        <li>TR-2024-318 <br /><span>Rec. Date: 01-30-2025</span></li>
-        <li>TR-2024-319 <br /><span>Rec. Date: 01-30-2025</span></li>
+        <ul class="test-list" id="solicitudes-list">
+          <% solicitudes.forEach(solicitud => { %>
+            <li data-id="<%= solicitud.ID %>">
+              TR-<%= solicitud.ID %> <br />
+              <span>Rec. Date: <%= solicitud.fecha_creacion.toISOString().split('T')[0] %></span>
+            </li>
+          <% }) %>
+        </ul>
+        
       </ul>
+      
     </section>
 
     <!-- Test Selection -->
@@ -41,20 +48,26 @@
       <h3>Test Selection</h3>
       <input type="text" placeholder="Search..." class="search-box" />
       <ul class="test-list">
-        <li>5.2.1 Cable Outside diameter <br /><span>Standard: ISO 18443-2</span></li>
-        <li>5.2.2 Insulation Thickness <br /><span>Standard: ISO 18443-2</span></li>
+        <% pruebas.forEach(p => { %>
+          <li>
+            <%= p.nombre_prueba %><br />
+            <span>Standard: <%= p.estandar %></span>
+          </li>
+        <% }) %>
       </ul>
+      
     </section>
 
     <!-- Datos -->
     <section class="data-section">
       <div class="environment-data">
         <label>Temperature:</label>
-        <input type="text" />
+        <input type="text" id="temperature" />
         <label>Humidity:</label>
-        <input type="text" />
+        <input type="text" id="humidity" />
         <label>Atmospheric Pressure:</label>
-        <input type="text" />
+        <input type="text" id="pressure" />
+        
       </div>
 
       <table>
@@ -129,6 +142,100 @@
 
       <button class="save-btn">SAVE</button>
     </section>
+
+    
   </div>
+
+  <script>
+    document.querySelector(".save-btn").addEventListener("click", async () => {
+      const testRequestId = 319; // Puedes cambiar esto dinámicamente
+      const technicianId = 7; // Igualmente, esto debe venir de la sesión idealmente
+  
+      const temperature = document.getElementById("temperature").value;
+      const humidity = document.getElementById("humidity").value;
+      const pressure = document.getElementById("pressure").value;
+  
+      const values = document.querySelectorAll("tbody input");
+      const valueList = Array.from(values).map(input => input.value);
+  
+      const result = {
+        test_request_id: testRequestId,
+        technician_id: technicianId,
+        environment: {
+          temperature,
+          humidity,
+          atmospheric_pressure: pressure
+        },
+        cable_info: {
+          family: "FLY",
+          cross_section: "0.50 mm",
+          color: "WH"
+        },
+        tests: {
+          value_1_min: valueList[0],
+          value_1_max: valueList[1],
+          value_2_min: valueList[2],
+          value_2_max: valueList[3],
+          value_3_min: valueList[4],
+          value_3_max: valueList[5],
+          average: valueList[6],
+          status: valueList[7]
+        },
+        comments: "OK", // puedes agregar un input para comentarios si lo deseas
+        start_time: new Date(),
+        end_time: new Date()
+      };
+  
+      try {
+        const response = await fetch("/guardar-resultados", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(result)
+        });
+  
+        const data = await response.json();
+        alert(data.mensaje || "Resultado guardado");
+      } catch (err) {
+        console.error("❌ Error al guardar:", err);
+        alert("Error al guardar datos");
+      }
+    });
+  </script>
+  <script>
+    const solicitudesList = document.getElementById("solicitudes-list");
+    const pruebasList = document.getElementById("pruebas-list");
+  
+    solicitudesList.addEventListener("click", async (e) => {
+      const li = e.target.closest("li");
+      if (!li) return;
+  
+      const requestId = li.dataset.id;
+  
+      try {
+        const res = await fetch(`/api/pruebas/${requestId}`);
+        const pruebas = await res.json();
+  
+        pruebasList.innerHTML = ""; // Limpiar
+  
+        if (pruebas.length === 0) {
+          pruebasList.innerHTML = "<li>No hay pruebas asignadas</li>";
+          return;
+        }
+  
+        pruebas.forEach(p => {
+          const item = document.createElement("li");
+          item.innerHTML = `${p.nombre_prueba}<br/><span>Standard: ${p.estandar}</span>`;
+          pruebasList.appendChild(item);
+        });
+  
+      } catch (error) {
+        console.error(" Error al obtener pruebas:", error);
+      }
+    });
+  </script>
+  
+
 </body>
 </html>
