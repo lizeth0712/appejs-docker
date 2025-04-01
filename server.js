@@ -412,9 +412,9 @@ app.post("/coordinador/estatus/:id", async (req, res) => {
 
     try {
 
-        await axios.post("http://localhost:5000/asignar_tecnico", {
-            tecnico_id: tecnicoId,
-            prueba_id: solicitudId
+        await axios.post('http://localhost:5000/notificar_cliente', {
+            prueba_id: solicitudId,
+            nuevo_estatus: nuevoEstatus
         });
 
         await pool.query(
