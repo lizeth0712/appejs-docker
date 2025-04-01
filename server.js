@@ -45,6 +45,31 @@ app.use((req, res, next) => {
 // Motor de plantillas
 app.set("view engine", "ejs");
 
+
+//register
+app.get("/register", (req, res) => {
+    if (!req.session.user || req.session.user.rol !== 'coordinador') {
+        return res.redirect('/');
+    }
+    res.render("register", { titulo: "Registrar usuario" });
+});
+
+// Guardar nuevo usuario
+app.post("/register", async (req, res) => {
+    const { nombre, correo, contra, rol } = req.body;
+
+    try {
+        await pool.query(
+            "INSERT INTO users (nombre, correo, contra, rol) VALUES (?, ?, ?, ?)",
+            [nombre, correo, contra, rol]
+        );
+        res.redirect("/coordinador");
+    } catch (error) {
+        console.error("Error al registrar usuario:", error.message);
+        res.status(500).send("Error al registrar usuario");
+    }
+});
+
 // Login
 app.get("/", (req, res) => {
     const error = req.session.errorLogin || null;
