@@ -360,6 +360,12 @@ app.post("/coordinador/estatus/:id", async (req, res) => {
     const nuevoEstatus = req.body.estatus;
     
     try {
+
+        await axios.post('http://localhost:5000/notificar_cliente', {
+            prueba_id: solicitudId,
+            nuevo_estatus: nuevoEstatus
+        });
+
         await pool.query(
             "UPDATE test_requests SET estatus = ? WHERE ID = ?",
             [nuevoEstatus, solicitudId]
