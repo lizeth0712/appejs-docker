@@ -1,0 +1,129 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  /* Fondo general */
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #001f5b;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  
+ 
+  .form-container {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 400px;
+  }
+  
+  
+  .form-container h2 {
+    margin-bottom: 20px;
+    color: #001f5b;
+    text-align: center;
+  }
+  
+ 
+  form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    margin-top: 16px;
+  }
+  
+  form input,
+  form select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+  }
+  
+  form input:focus,
+  form select:focus {
+    outline: none;
+    border-color: #001f87;
+  }
+  
+  /* Botón */
+  form button {
+    margin-top: 24px;
+    width: 100%;
+    background-color: #001f87;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  
+  form button:hover {
+    background-color: #0033aa;
+    transform: scale(1.03);
+  }
+  
+  .form-container a {
+    display: inline-block;
+    margin-top: 20px;
+    color: #001f5b;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+  }
+  
+  .form-container a:hover {
+    color: #007bff;
+  }
+
+.navbar {
+    background-color: #ffffff;
+    padding: 10px;
+    border-top: 35px solid #001f5b;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 10;
+  }
+  
+  .containerNavBar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 40px;
+  }
+  
+  .navbar-brand img {
+    height: auto;
+  }
+  
+  .nav-link {
+    font-weight: bold;
+    color: #001f5b;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+  
+  .nav-link:hover {
+    color: #007bff;
+  }
+  
+  .form-container {
+    margin-top: 120px;
+  }
+  
+  
