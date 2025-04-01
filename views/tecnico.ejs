@@ -6,6 +6,7 @@
   <link rel="stylesheet" href="/css/tecnico.css" />
   <title>Técnico</title>
   
+  <script src="https://unpkg.com/lucide@latest"></script>
   <!--Load the AJAX API-->
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -60,7 +61,10 @@
       </a>
       <div>
         <span>Hello, <%= nombre %></span>
-        <a href="/logout">LOGOUT</a>
+        <a href="/logout" title="Cerrar sesión" class="nav-icon">
+          <i data-lucide="log-out"></i>
+        </a>
+
       </div>
     </div>
   </nav>
@@ -163,13 +167,22 @@
           </tr>
           <tr>
             <td></td><td></td><td></td>
-            <td>Status</td>
-            <td><input type="text" /></td>
+            <td>Specifications</td>
+            <td><input type="text" id="specs" readonly /></td>
           </tr>
+          
+          <tr>
+            <td></td><td></td><td></td>
+            <td>Status</td>
+            <td><input type="text" id="status" readonly /></td>
+          </tr>
+          
         </tbody>
       </table>
 
       <button class="save-btn">SAVE</button>
+      <button class="save-btn" id="completedBtn" style="background-color: green;">COMPLETED</button>
+      <span id="warningMsg" style="color: red; margin-left: 10px;"></span>
     </section>
   </div>
   <script>
@@ -194,9 +207,35 @@
           document.getElementById("calibre").textContent = `${data.calibre} mm`;
           document.getElementById("color").textContent = data.color;
   
-          // Limpiar campos de valores
+          // Limpiar valores anteriores
           document.querySelectorAll('.valor').forEach(input => input.value = "");
           document.getElementById("avg").value = "";
+          document.getElementById("specs").value = "";
+  
+          // Especificaciones dinámicas
+          const calibreNum = parseFloat(data.calibre);
+          const tipoPrueba = data.tipo_prueba.trim();
+          let specText = "";
+  
+          if (tipoPrueba === "VW-1 Flame Test") {
+            specText = "Max 100 mm";
+          } else if (tipoPrueba === "Cable Outside Diameter") {
+            if (calibreNum === 0.35) specText = "0.3 - 0.5 mm";
+            else if (calibreNum === 0.5) specText = "0.4 - 0.6 mm";
+            else if (calibreNum === 0.75) specText = "0.6 - 0.9 mm";
+            else if (calibreNum === 1.0) specText = "0.8 - 1.2 mm";
+            else specText = "OD: Sin especificación definida para este calibre";
+          } else if (tipoPrueba === "Insulation Thickness") {
+            if (calibreNum === 0.35) specText = "Min: 0.1 mm | Prom: 0.2 mm";
+            else if (calibreNum === 0.5) specText = "Min: 0.15 mm | Prom: 0.25 mm";
+            else if (calibreNum === 0.75) specText = "Min: 0.20 mm | Prom: 0.30 mm";
+            else if (calibreNum === 1.0) specText = "Min: 0.25 mm | Prom: 0.35 mm";
+            else specText = "Sin especificación definida para este calibre";
+          } else {
+            specText = "Tipo de prueba no reconocido";
+          }
+  
+          document.getElementById("specs").value = specText;
   
         } catch (err) {
           console.error("Error cargando TR:", err);
@@ -205,12 +244,15 @@
       });
     });
   </script>
+  <script>
+    lucide.createIcons();
+  </script>
   
 </body>
 </html>
 <script>
-  // Función para calcular el promedio de los 6 valores
-  function calcularPromedio() {
+  // Calcular promedio y validar status
+  function calcularPromedioYStatus() {
     const valores = document.querySelectorAll('.valor');
     let suma = 0;
     let count = 0;
@@ -229,11 +271,77 @@
     } else {
       document.getElementById("avg").value = "";
     }
+
+    validarStatus();
   }
 
-  // Escuchar cambios en los inputs de valor
+  // Validar status conforme o no conforme
+  function validarStatus() {
+    const tipoPrueba = document.getElementById("tipo-prueba").textContent.trim();
+    const calibreStr = document.getElementById("calibre").textContent.trim().replace(" mm", "");
+    const calibreNum = parseFloat(calibreStr);
+    const valores = document.querySelectorAll('.valor');
+    const statusInput = document.getElementById("status");
+
+    let min = 0, max = 0;
+
+    if (tipoPrueba === "Cable Outside Diameter") {
+      if (calibreNum === 0.35) [min, max] = [0.3, 0.5];
+      else if (calibreNum === 0.5) [min, max] = [0.4, 0.6];
+      else if (calibreNum === 0.75) [min, max] = [0.6, 0.9];
+      else if (calibreNum === 1.0) [min, max] = [0.8, 1.2];
+    } else if (tipoPrueba === "Insulation Thickness") {
+      if (calibreNum === 0.35) [min, max] = [0.1, 0.3];
+      else if (calibreNum === 0.5) [min, max] = [0.15, 0.35];
+      else if (calibreNum === 0.75) [min, max] = [0.20, 0.40];
+      else if (calibreNum === 1.0) [min, max] = [0.25, 0.45];
+    } else if (tipoPrueba === "VW-1 Flame Test") {
+      [min, max] = [0, 100];
+    }
+
+    let conforme = true;
+    valores.forEach(input => {
+      const val = parseFloat(input.value);
+      if (!isNaN(val)) {
+        if (val < min || val > max) conforme = false;
+      }
+    });
+
+    statusInput.value = conforme ? "C" : "NC";
+  }
+
+  // Escuchar cambios en inputs
   document.querySelectorAll('.valor').forEach(input => {
-    input.addEventListener('input', calcularPromedio);
+    input.addEventListener('input', calcularPromedioYStatus);
   });
 </script>
+<script>
+  const completedBtn = document.getElementById("completedBtn");
+  const warningMsg = document.getElementById("warningMsg");
+
+  completedBtn.addEventListener("click", (e) => {
+    const valores = document.querySelectorAll(".valor");
+    let camposLlenos = true;
+
+    valores.forEach(input => {
+      if (input.value.trim() === "") {
+        camposLlenos = false;
+      }
+    });
+
+    if (!camposLlenos) {
+      e.preventDefault();
+      warningMsg.textContent = "⚠️ Please fill in all fields before marking as completed.";
+
+     
+    } else {
+      warningMsg.textContent = ""; // limpiar si todo está bien
+      // Aquí podrías agregar una función para guardar o enviar
+      console.log("Formulario completo. Puedes continuar.");
+    }
+  });
+</script>
+
+
+
 
