@@ -191,7 +191,7 @@ app.get("/coordinador", async (req, res) => {
 
 
 
-// Técnico
+//Técnico
 app.get("/tecnico", async (req, res) => {
     if (!req.session.user || req.session.user.rol !== 'tecnico') {
       return res.redirect('/');
@@ -205,25 +205,76 @@ app.get("/tecnico", async (req, res) => {
         [tecnicoId]
       );
   
-      let pruebas = [];
+      let cableData = {};
       if (solicitudes.length > 0) {
-        const selectedRequestId = solicitudes[0].ID;
-        const [result] = await pool.query(
-          "SELECT * FROM test_details WHERE request_id = ?",
-          [selectedRequestId]
-        );
-        pruebas = result;
+        const selectedRequest = solicitudes[0];
+  
+        cableData = {
+          id: selectedRequest.ID,
+          familia: selectedRequest.familia,
+          calibre: selectedRequest.calibre,
+          color: selectedRequest.color,
+          tipo_prueba: selectedRequest.tipo_prueba,
+          estandar: selectedRequest.standar
+        };
       }
+  
+      // Contar solicitudes "aprobado" y "completado"
+      let countAprobado = 0;
+      let countCompletado = 0;
+  
+      solicitudes.forEach(s => {
+        if (s.estatus === "aprobado") countAprobado++;
+        if (s.estatus === "completado") countCompletado++;
+      });
   
       res.render("tecnico", {
         titulo: "Técnico",
         nombre: req.session.user.nombre,
         solicitudes,
-        pruebas
+        cableData,
+        countAprobado,
+        countCompletado
+      });
+  
+    } catch (error) {
+      console.error("❌ Error al cargar técnico:", error.message);
+      res.status(500).send("Error al cargar datos del técnico");
+    }
+  });
+  
+  
+  
+  //Tecnico solicitudes
+  app.get("/api/tr/:id", async (req, res) => {
+    if (!req.session.user || req.session.user.rol !== 'tecnico') {
+      return res.status(401).json({ error: "No autorizado" });
+    }
+  
+    const trId = req.params.id;
+    const tecnicoId = req.session.user.id;
+  
+    try {
+      const [rows] = await pool.query(
+        "SELECT * FROM test_requests WHERE ID = ? AND tecnico_id = ?",
+        [trId, tecnicoId]
+      );
+  
+      if (rows.length === 0) {
+        return res.status(404).json({ error: "TR no encontrada o no asignada a ti" });
+      }
+  
+      const tr = rows[0];
+      res.json({
+        tipo_prueba: tr.tipo_prueba,
+        estandar: tr.standar,
+        familia: tr.familia,
+        calibre: tr.calibre,
+        color: tr.color
       });
     } catch (error) {
-      console.error("❌ Error al cargar solicitudes o pruebas:", error.message);
-      res.status(500).send("Error al cargar los datos");
+      console.error("❌ Error en /api/tr/:id", error.message);
+      res.status(500).json({ error: "Error del servidor" });
     }
   });
   
@@ -390,11 +441,11 @@ app.post("/coordinador/asignar/:id", async (req, res) => {
     const tecnicoId = req.body.tecnico_id;
 
     try {
-
         await axios.post("http://localhost:5000/asignar_tecnico", {
             tecnico_id: tecnicoId,
             prueba_id: solicitudId
         });
+
 
         await pool.query(
             "UPDATE test_requests SET tecnico_id = ? WHERE ID = ?",

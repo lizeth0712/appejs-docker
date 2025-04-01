@@ -2,24 +2,66 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link rel="stylesheet" href="/css/tecnico.css" />
-  <link rel="icon" type="image/png" href="/img/cofilogo.ico">
+  <title>Técnico</title>
+  
+  <!--Load the AJAX API-->
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-  <title>Tecnico</title>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script type="text/javascript">
+    google.charts.load('current', {'packages': ['corechart']});
+    google.charts.setOnLoadCallback(drawChart);
+  
+    function drawChart() {
+      const countAprobado = parseInt(document.getElementById('countAprobado').value) || 0;
+      const countCompletado = parseInt(document.getElementById('countCompletado').value) || 0;
+  
+      const data = google.visualization.arrayToDataTable([
+        ['Status', 'Requests', { role: 'style' }],
+        ['Approved', countAprobado, 'color: red'],
+        ['Completed', countCompletado, 'color: green']
+      ]);
+  
+      const max = Math.max(countAprobado, countCompletado);
+      const ticks = [];
+      for (let i = 0; i <= max + 1; i++) ticks.push(i); // Genera [0, 1, 2, ..., N]
+  
+      const options = {
+        title: 'Test Requests',
+        legend: { position: 'none' },
+        width: 300,
+        height: 200,
+        vAxis: {
+          title: 'Amount',
+          format: '0',
+          ticks: ticks
+        },
+        hAxis: {
+          title: 'Status'
+        }
+      };
+  
+      const chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+      chart.draw(data, options);
+    }
+  </script>
+  
+  
+  
+
 </head>
 <body>
   <!-- NAVBAR -->
   <nav class="navbar navbar-dark">
     <div class="containerNavBar">
-        <a href="#" class="navbar-brand">
-            <img src="img/logo.png" alt="Coficab Logo" width="120">
-        </a>
-        <div>
-          <span>Hola, <%= nombre %></span>
-
-            <a href="/logout" >Cerrar sesión</a>
-        </div>
+      <a href="#" class="navbar-brand">
+        <img src="img/logo.png" alt="Coficab Logo" width="120" />
+      </a>
+      <div>
+        <span>Hello, <%= nombre %></span>
+        <a href="/logout">LOGOUT</a>
+      </div>
     </div>
   </nav>
 
@@ -30,33 +72,34 @@
       <h3>Test Request Selection</h3>
       <input type="text" placeholder="Search..." class="search-box" />
       <ul class="test-list">
-        <ul class="test-list" id="solicitudes-list">
-          <% solicitudes.forEach(solicitud => { %>
-            <li data-id="<%= solicitud.ID %>">
-              TR-<%= solicitud.ID %> <br />
-              <span>Rec. Date: <%= solicitud.fecha_creacion.toISOString().split('T')[0] %></span>
-            </li>
-          <% }) %>
-        </ul>
-        
-      </ul>
-      
-    </section>
-
-    <!-- Test Selection -->
-    <section class="test-selection-section">
-      <h3>Test Selection</h3>
-      <input type="text" placeholder="Search..." class="search-box" />
-      <ul class="test-list">
-        <% pruebas.forEach(p => { %>
-          <li>
-            <%= p.nombre_prueba %><br />
-            <span>Standard: <%= p.estandar %></span>
+        <% solicitudes.forEach(solicitud => { %>
+          <li data-id="<%= solicitud.ID %>">
+            TR-<%= solicitud.ID %> <br />
+            <span>Rec. Date: <%= solicitud.fecha_creacion.toISOString().split('T')[0] %></span>
           </li>
         <% }) %>
       </ul>
-      
+       <!--Div that will hold the pie chart-->
+       
+       <div id="chart_div" style="margin-top: 10px;"></div>
+
     </section>
+
+    <!-- Test Selection -->
+    <!-- TEST SELECTION -->
+    <section class="test-selection-section">
+      <h3>Test Selection</h3>
+      <ul class="test-list" id="test-info">
+        <li>
+          <span id="tipo-prueba"><%= cableData.tipo_prueba %></span><br />
+          <span id="estandar-prueba">Standard: <%= cableData.estandar %></span>
+        </li>
+      </ul>
+      <input type="hidden" id="countAprobado" value="<%= countAprobado %>">
+      <input type="hidden" id="countCompletado" value="<%= countCompletado %>">
+
+    </section>
+
 
     <!-- Datos -->
     <section class="data-section">
@@ -67,7 +110,6 @@
         <input type="text" id="humidity" />
         <label>Atmospheric Pressure:</label>
         <input type="text" id="pressure" />
-        
       </div>
 
       <table>
@@ -82,58 +124,45 @@
         </thead>
         <tbody>
           <tr>
-            <td>FLY</td>
-            <td><strong>0.50 mm</strong></td>
-            <td>WH</td>
+            <td id="familia"><%= cableData.familia || '' %></td>
+            <td><strong id="calibre"><%= cableData.calibre || '' %> mm</strong></td>
+            <td id="color"><%= cableData.color || '' %></td>
+
             <td>Value 1 Min</td>
-            <td><input type="text" /></td>
+            <td><input type="text" class="valor" /></td>
           </tr>
           <tr>
-            <td></td>
-            <td></td>
-            <td></td>
+            <td></td><td></td><td></td>
             <td>Value 1 Max</td>
-            <td><input type="text" /></td>
+            <td><input type="text" class="valor" /></td>
           </tr>
           <tr>
-            <td></td>
-            <td></td>
-            <td></td>
+            <td></td><td></td><td></td>
             <td>Value 2 Min</td>
-            <td><input type="text" /></td>
+            <td><input type="text" class="valor" /></td>
           </tr>
           <tr>
-            <td></td>
-            <td></td>
-            <td></td>
+            <td></td><td></td><td></td>
             <td>Value 2 Max</td>
-            <td><input type="text" /></td>
+            <td><input type="text" class="valor" /></td>
           </tr>
           <tr>
-            <td></td>
-            <td></td>
-            <td></td>
+            <td></td><td></td><td></td>
             <td>Value 3 Min</td>
-            <td><input type="text" /></td>
+            <td><input type="text" class="valor" /></td>
           </tr>
           <tr>
-            <td></td>
-            <td></td>
-            <td></td>
+            <td></td><td></td><td></td>
             <td>Value 3 Max</td>
-            <td><input type="text" /></td>
+            <td><input type="text" class="valor" /></td>
           </tr>
           <tr>
-            <td></td>
-            <td></td>
-            <td></td>
+            <td></td><td></td><td></td>
             <td>Average</td>
-            <td><input type="text" /></td>
+            <td><input type="text" id="avg" readonly /></td>
           </tr>
           <tr>
-            <td></td>
-            <td></td>
-            <td></td>
+            <td></td><td></td><td></td>
             <td>Status</td>
             <td><input type="text" /></td>
           </tr>
@@ -142,100 +171,69 @@
 
       <button class="save-btn">SAVE</button>
     </section>
-
-    
   </div>
-
   <script>
-    document.querySelector(".save-btn").addEventListener("click", async () => {
-      const testRequestId = 319; // Puedes cambiar esto dinámicamente
-      const technicianId = 7; // Igualmente, esto debe venir de la sesión idealmente
+    const trItems = document.querySelectorAll(".test-request-section li");
   
-      const temperature = document.getElementById("temperature").value;
-      const humidity = document.getElementById("humidity").value;
-      const pressure = document.getElementById("pressure").value;
+    trItems.forEach(item => {
+      item.addEventListener("click", async () => {
+        const trId = item.dataset.id;
+        try {
+          const res = await fetch(`/api/tr/${trId}`);
+          const data = await res.json();
   
-      const values = document.querySelectorAll("tbody input");
-      const valueList = Array.from(values).map(input => input.value);
+          if (data.error) {
+            alert(data.error);
+            return;
+          }
   
-      const result = {
-        test_request_id: testRequestId,
-        technician_id: technicianId,
-        environment: {
-          temperature,
-          humidity,
-          atmospheric_pressure: pressure
-        },
-        cable_info: {
-          family: "FLY",
-          cross_section: "0.50 mm",
-          color: "WH"
-        },
-        tests: {
-          value_1_min: valueList[0],
-          value_1_max: valueList[1],
-          value_2_min: valueList[2],
-          value_2_max: valueList[3],
-          value_3_min: valueList[4],
-          value_3_max: valueList[5],
-          average: valueList[6],
-          status: valueList[7]
-        },
-        comments: "OK", // puedes agregar un input para comentarios si lo deseas
-        start_time: new Date(),
-        end_time: new Date()
-      };
+          // Actualizar DOM
+          document.getElementById("tipo-prueba").textContent = data.tipo_prueba;
+          document.getElementById("estandar-prueba").textContent = `Standard: ${data.estandar}`;
+          document.getElementById("familia").textContent = data.familia;
+          document.getElementById("calibre").textContent = `${data.calibre} mm`;
+          document.getElementById("color").textContent = data.color;
   
-      try {
-        const response = await fetch("/guardar-resultados", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(result)
-        });
+          // Limpiar campos de valores
+          document.querySelectorAll('.valor').forEach(input => input.value = "");
+          document.getElementById("avg").value = "";
   
-        const data = await response.json();
-        alert(data.mensaje || "Resultado guardado");
-      } catch (err) {
-        console.error("❌ Error al guardar:", err);
-        alert("Error al guardar datos");
-      }
-    });
-  </script>
-  <script>
-    const solicitudesList = document.getElementById("solicitudes-list");
-    const pruebasList = document.getElementById("pruebas-list");
-  
-    solicitudesList.addEventListener("click", async (e) => {
-      const li = e.target.closest("li");
-      if (!li) return;
-  
-      const requestId = li.dataset.id;
-  
-      try {
-        const res = await fetch(`/api/pruebas/${requestId}`);
-        const pruebas = await res.json();
-  
-        pruebasList.innerHTML = ""; // Limpiar
-  
-        if (pruebas.length === 0) {
-          pruebasList.innerHTML = "<li>No hay pruebas asignadas</li>";
-          return;
+        } catch (err) {
+          console.error("Error cargando TR:", err);
+          alert("Error al cargar la solicitud seleccionada");
         }
-  
-        pruebas.forEach(p => {
-          const item = document.createElement("li");
-          item.innerHTML = `${p.nombre_prueba}<br/><span>Standard: ${p.estandar}</span>`;
-          pruebasList.appendChild(item);
-        });
-  
-      } catch (error) {
-        console.error(" Error al obtener pruebas:", error);
-      }
+      });
     });
   </script>
   
-
 </body>
 </html>
+<script>
+  // Función para calcular el promedio de los 6 valores
+  function calcularPromedio() {
+    const valores = document.querySelectorAll('.valor');
+    let suma = 0;
+    let count = 0;
+
+    valores.forEach(input => {
+      const num = parseFloat(input.value);
+      if (!isNaN(num)) {
+        suma += num;
+        count++;
+      }
+    });
+
+    if (count === 6) {
+      const avg = (suma / 6).toFixed(2);
+      document.getElementById("avg").value = avg;
+    } else {
+      document.getElementById("avg").value = "";
+    }
+  }
+
+  // Escuchar cambios en los inputs de valor
+  document.querySelectorAll('.valor').forEach(input => {
+    input.addEventListener('input', calcularPromedio);
+  });
+</script>
+
