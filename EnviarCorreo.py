@@ -82,7 +82,7 @@ def asignar_tecnico():
 
         # Enviar correo de notificación
         asunto = "Nueva asignación de prueba"
-        cuerpo = f"Hola {nombre_tecnico},\n\nHas sido asignado a la prueba con ID {prueba_id}.\n\nPor favor, revisa el sistema para más detalles."
+        cuerpo = f"Hola {nombre_tecnico},\n\nHas sido asignado a la prueba con ID TR-{prueba_id}.\n\nPor favor, revisa el sistema para más detalles."
 
         if enviar_correo_tecnico(correo_tecnico, asunto, cuerpo):
             return jsonify({"mensaje": "Correo enviado exitosamente"})
@@ -121,13 +121,13 @@ def notificar_cliente():
 
         correo_cliente = solicitud["correo"]
         nombre_cliente = solicitud["nombre"]
-        codigo_prueba = solicitud["ID"]  # Usamos ID en lugar de codigo_prueba
+        codigo_prueba = solicitud["ID"] 
 
             # Enviar correo
-        asunto = f"Tu prueba {codigo_prueba} ha cambiado de estado"
+        asunto = f"Tu prueba TR-{codigo_prueba} ha cambiado de estado"
         cuerpo = f"""
                 Hola {nombre_cliente},\n\n
-                La prueba con ID {codigo_prueba} ha cambiado de estado.\n
+                La prueba con ID TR-{codigo_prueba} ha cambiado de estado.\n
                 Estado: {nuevo_estatus.upper()}\n\n
                 Gracias por utilizar nuestro servicio.
             """
