@@ -5,6 +5,7 @@ const dotenv = require("dotenv");
 const session = require("express-session");
 const mongoose = require("mongoose");
 const { pool } = require('./config/conexion');
+const axios = require("axios");
 
 const port = 3000;
 
@@ -434,6 +435,12 @@ app.post("/coordinador/asignar/:id", async (req, res) => {
     const tecnicoId = req.body.tecnico_id;
 
     try {
+        await axios.post("http://localhost:5000/asignar_tecnico", {
+            tecnico_id: tecnicoId,
+            prueba_id: solicitudId
+        });
+
+
         await pool.query(
             "UPDATE test_requests SET tecnico_id = ? WHERE ID = ?",
             [tecnicoId, solicitudId]
