@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registro de Usuario</title>
+  <link rel="stylesheet" href="/css/register.css" />
+</head>
+<body>
+
+
+  <nav class="navbar">
+    <div class="containerNavBar">
+      <a href="#" class="navbar-brand">
+        <img src="/img/logo.png" alt="Coficab Logo" width="120">
+      </a>
+      <div>
+        <a href="/coordinador" class="nav-link">← Volver al panel</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="form-container">
+    <h2>Registrar nuevo usuario</h2>
+    <form action="/register" method="POST">
+      <label for="nombre">Nombre:</label>
+      <input type="text" name="nombre" required>
+
+      <label for="correo">Correo:</label>
+      <input type="email" name="correo" required>
+
+      <label for="contra">Contraseña:</label>
+      <input type="password" name="contra" required>
+
+      <label for="rol">Rol:</label>
+      <select name="rol" required>
+        <option value="cliente">Cliente</option>
+        <option value="tecnico">Técnico</option>
+      </select>
+
+      <button type="submit">Registrar</button>
+    </form>
+  </div>
+</body>
+</html>
