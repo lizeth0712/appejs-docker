@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="/css/coordinador.css" />
@@ -12,16 +14,24 @@
   <!-- NAVBAR -->
   <nav class="navbar navbar-dark">
     <div class="containerNavBar">
-        <a href="#" class="navbar-brand">
-            <img src="img/logo.png" alt="Coficab Logo" width="120">
+      <a href="#" class="navbar-brand">
+        <img src="img/logo.png" alt="Coficab Logo" width="120">
+      </a>
+      <div class="nav-icons">
+        <span class="nav-user">Hola, <%= nombre %></span>
+  
+        <a href="/register" title="Registrar usuario" class="nav-icon">
+          <i data-lucide="user-plus"></i>
         </a>
-        <div>
-          <span>Hello, <%= nombre %></span>
-
-            <a href="/logout">LOGOUT</a>
-        </div>
+  
+        <a href="/logout" title="Cerrar sesión" class="nav-icon">
+          <i data-lucide="log-out"></i>
+        </a>
+      </div>
     </div>
   </nav>
+  
+
   <div class="container">
     <!-- Barra lateral -->
     <aside class="sidebar">
@@ -37,7 +47,7 @@
       <!-- Lista dinámica de solicitudes -->
       <ul class="requests">
         <% solicitudes.forEach(item => { %>
-          <li>
+          <li class="<%= item.estatus === 'completado' ? 'completado' : '' %>">
             <a href="/coordinador?id=<%= item.ID %>">
               TR-<%= item.ID %><br />
               <small>Rec. Date: <%= item.fecha_creacion.toLocaleDateString() %></small>
@@ -45,6 +55,7 @@
           </li>
         <% }) %>
       </ul>
+      
     </aside>
     
     
@@ -91,8 +102,8 @@
         <!-- Botones para cambiar estatus -->
         <section class="estatus-update">
           <form action="/coordinador/estatus/<%= seleccionada.ID %>" method="POST" class="status-form">
-            <button type="submit" name="estatus" value="aprobado" class="buttonA">Approved</button>
-            <button type="submit" name="estatus" value="rechazado" class="buttonR">Decline</button>
+            <button type="submit" name="estatus" value="aprobado" class="buttonA">Aprobar</button>
+            <button type="submit" name="estatus" value="rechazado" class="buttonR">Rechazar</button>
           </form>
         </section>
         <section class="tecnico">
@@ -117,5 +128,9 @@
     
     
   </div>
+  <script>
+    lucide.createIcons();
+  </script>
+  
 </body>
 </html>

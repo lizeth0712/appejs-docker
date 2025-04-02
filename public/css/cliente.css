@@ -132,6 +132,25 @@ body {
   .delete-btn:hover {
     background-color: #b71c1c;
   }
+  .status.completado {
+    background-color: #d4edda;
+    color: #155724;
+    font-weight: bold;
+    border-radius: 4px;
+    padding: 4px 8px;
+    text-align: center;
+  }
+  
+  .status.rechazado {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+  
+  .status.pendiente {
+    background-color: #fff3cd;
+    color: #856404;
+  }
+  
   
   /* Responsivo */
   @media (max-width: 768px) {

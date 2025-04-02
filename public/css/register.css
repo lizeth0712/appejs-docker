@@ -125,5 +125,17 @@
   .form-container {
     margin-top: 120px;
   }
+
+  .error-message {
+    color: red;
+    background-color: #ffe6e6;
+    border: 1px solid red;
+    padding: 10px;
+    margin-bottom: 16px;
+    border-radius: 6px;
+    font-weight: bold;
+    text-align: center;
+  }
+  
   
   

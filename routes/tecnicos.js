@@ -23,7 +23,7 @@ router.post("/guardar-resultados", async (req, res) => {
       technician_id,
       environment,
       cable_info,
-      tests,
+      tests: [ { ...tests } ],
       comments,
       start_time,
       end_time

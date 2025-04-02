@@ -55,14 +55,25 @@
                 <td>TR-2025-<%= solicitud.ID %></td>
                 <td><%= solicitud.meta %></td>
                 <td><%= solicitud.fecha_creacion.toLocaleString() %></td>
-                <td class="status <%= solicitud.estatus.toLowerCase() %>"><%= solicitud.estatus.toUpperCase() %></td>
+                <td class="status <%= solicitud.estatus.toLowerCase() %>">
+                  <%= solicitud.estatus.toUpperCase() %>
+                </td>
                 <td>
-                  <a href="/edit/<%= solicitud.ID %>"><button class="edit-btn">Edit</button></a>
-
-                  <form action="/delete/<%= solicitud.ID %>" method="POST" onsubmit="return confirm('Are you sure you want to delete this test request?');" style="display:inline;">
+                  <a href="/edit/<%= solicitud.ID %>">
+                    <button class="edit-btn">Edit</button>
+                  </a>
+        
+                  <form action="/delete/<%= solicitud.ID %>" method="POST"
+                    onsubmit="return confirm('Are you sure you want to delete this test request?');"
+                    style="display:inline;">
                     <button class="delete-btn">Delete</button>
                   </form>
-                  
+        
+                  <% if (solicitud.estatus.toLowerCase() === "completado") { %>
+                    <a href="/cliente/reporte/<%= solicitud.ID %>">
+                      <button class="download-btn">Download PDF</button>
+                    </a>
+                  <% } %>
                 </td>
               </tr>
             <% }) %>

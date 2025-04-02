@@ -53,6 +53,9 @@
 
 </head>
 <body>
+
+
+  
   <!-- NAVBAR -->
   <nav class="navbar navbar-dark">
     <div class="containerNavBar">
@@ -180,7 +183,7 @@
         </tbody>
       </table>
 
-      <button class="save-btn">SAVE</button>
+      <button class="save-btn" id="guardarBtn">SAVE</button>
       <button class="save-btn" id="completedBtn" style="background-color: green;">COMPLETED</button>
       <span id="warningMsg" style="color: red; margin-left: 10px;"></span>
     </section>
@@ -189,12 +192,15 @@
     const trItems = document.querySelectorAll(".test-request-section li");
   
     trItems.forEach(item => {
-      item.addEventListener("click", async () => {
-        const trId = item.dataset.id;
-        try {
-          const res = await fetch(`/api/tr/${trId}`);
-          const data = await res.json();
-  
+  item.addEventListener("click", async () => {
+    // 👉 LÓGICA NUEVA: resaltar el seleccionado
+    trItems.forEach(li => li.classList.remove("selected"));
+    item.classList.add("selected");
+
+    const trId = item.dataset.id;
+    try {
+      const res = await fetch(`/api/tr/${trId}`);
+      const data = await res.json();
           if (data.error) {
             alert(data.error);
             return;
@@ -247,6 +253,80 @@
   <script>
     lucide.createIcons();
   </script>
+
+<script>
+  document.getElementById("guardarBtn").addEventListener("click", async () => {
+    const selectedItem = document.querySelector(".test-request-section li.selected");
+    const warningMsg = document.getElementById("warningMsg");
+
+    if (!selectedItem) {
+      warningMsg.textContent = "⚠️ Selecciona primero una solicitud.";
+      warningMsg.style.color = "red";
+      return;
+    }
+
+    const trId = selectedItem.dataset.id;
+    const resultados = Array.from(document.querySelectorAll(".valor")).map(i => i.value.trim());
+    const incompletos = resultados.some(v => v === "");
+
+    const environment = {
+      temperature: document.getElementById("temperature").value.trim(),
+      humidity: document.getElementById("humidity").value.trim(),
+      pressure: document.getElementById("pressure").value.trim()
+    };
+
+    const cable_info = {
+      familia: document.getElementById("familia").textContent.trim(),
+      calibre: document.getElementById("calibre").textContent.trim().replace(" mm", ""),
+      color: document.getElementById("color").textContent.trim()
+    };
+
+    const tests = {
+      valores: resultados,
+      promedio: document.getElementById("avg").value,
+      specs: document.getElementById("specs").value,
+      status: document.getElementById("status").value
+    };
+
+    const payload = {
+        test_request_id: parseInt(trId),
+        environment,
+        cable_info,
+        tests,
+        comments: "",
+        start_time: new Date(),
+        end_time: new Date()
+      };
+
+    try {
+      console.log("Payload:", payload);
+
+      const res = await fetch("/tecnico/guardar-resultados", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+
+      if (data.error) {
+        warningMsg.textContent = `⚠️ ${data.error}`;
+        warningMsg.style.color = "red";
+      } else {
+        warningMsg.textContent = data.mensaje;
+        warningMsg.style.color = incompletos ? "orange" : "green";
+        document.getElementById("completedBtn").disabled = incompletos;
+      }
+    } catch (err) {
+      console.error("Error al guardar:", err);
+      warningMsg.textContent = "⚠️ Error al guardar resultados.";
+      warningMsg.style.color = "red";
+    }
+  });
+</script>
+
   
 </body>
 </html>
@@ -319,29 +399,48 @@
   const completedBtn = document.getElementById("completedBtn");
   const warningMsg = document.getElementById("warningMsg");
 
-  completedBtn.addEventListener("click", (e) => {
+  completedBtn.addEventListener("click", async () => {
     const valores = document.querySelectorAll(".valor");
-    let camposLlenos = true;
+    const resultados = Array.from(valores).map(v => v.value.trim());
 
-    valores.forEach(input => {
-      if (input.value.trim() === "") {
-        camposLlenos = false;
+    if (resultados.some(val => val === "")) {
+      warningMsg.textContent = "⚠️ Por favor, llena todos los campos antes de marcar como completado.";
+      warningMsg.style.color = "red";
+      return;
+    }
+
+    const selectedItem = document.querySelector(".test-request-section li.selected");
+    if (!selectedItem) {
+      warningMsg.textContent = "⚠️ Selecciona primero una solicitud.";
+      warningMsg.style.color = "red";
+      return;
+    }
+
+    const trId = selectedItem.dataset.id;
+
+    try {
+      const res = await fetch(`/api/tr/${trId}/completar`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ resultados })
+      });
+
+      const data = await res.json();
+
+      if (data.error) {
+        warningMsg.textContent = `⚠️ ${data.error}`;
+        warningMsg.style.color = "red";
+      } else {
+        warningMsg.textContent = "✅ Solicitud marcada como completada.";
+        warningMsg.style.color = "green";
+        // Opcional: actualizar UI
       }
-    });
-
-    if (!camposLlenos) {
-      e.preventDefault();
-      warningMsg.textContent = "⚠️ Please fill in all fields before marking as completed.";
-
-     
-    } else {
-      warningMsg.textContent = ""; // limpiar si todo está bien
-      // Aquí podrías agregar una función para guardar o enviar
-      console.log("Formulario completo. Puedes continuar.");
+    } catch (err) {
+      warningMsg.textContent = "⚠️ Error al completar la solicitud.";
+      warningMsg.style.color = "red";
+      console.error(err);
     }
   });
 </script>
-
-
-
-
