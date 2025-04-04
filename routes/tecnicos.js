@@ -23,7 +23,7 @@ router.post("/guardar-resultados", async (req, res) => {
       technician_id,
       environment,
       cable_info,
-      tests,
+      tests: [ { ...tests } ],
       comments,
       start_time,
       end_time
@@ -31,10 +31,10 @@ router.post("/guardar-resultados", async (req, res) => {
 
     await log.save();
 
-    res.status(200).json({ mensaje: "Guardado en MongoDB correctamente ✅" });
+    res.status(200).json({ mensaje: "Guardado exitosamente" });
   } catch (error) {
     console.error(" Error:", error.message);
-    res.status(500).json({ error: "Error al guardar en MongoDB" });
+    res.status(500).json({ error: "Error al guardar" });
   }
 });
 

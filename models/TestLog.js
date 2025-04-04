@@ -6,27 +6,19 @@ const testSchema = new mongoose.Schema({
   environment: {
     temperature: String,
     humidity: String,
-    atmospheric_pressure: String
+    pressure: String  // <-- importante: debe coincidir con el frontend
   },
   cable_info: {
-    family: String,
-    cross_section: String,
+    familia: String,
+    calibre: String,
     color: String
   },
   tests: [
     {
-      test_name: String,
-      standard: String,
-      values: {
-        value_1_min: Number,
-        value_1_max: Number,
-        value_2_min: Number,
-        value_2_max: Number,
-        value_3_min: Number,
-        value_3_max: Number,
-        average: Number,
-        status: String
-      }
+      valores: [String],
+      promedio: String,
+      specs: String,
+      status: String
     }
   ],
   comments: String,

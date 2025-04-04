@@ -129,6 +129,12 @@ body {
   .save-btn:hover {
     background-color: #000c66;
   }
+  .test-request-section li.selected {
+    background-color: #d4eaff;
+    border: 2px solid #007bff;
+    font-weight: bold;
+  }
+  
   
   /* Responsivo */
   @media (max-width: 768px) {

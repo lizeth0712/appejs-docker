@@ -6,6 +6,9 @@ const session = require("express-session");
 const mongoose = require("mongoose");
 const { pool } = require('./config/conexion');
 const axios = require("axios");
+const PDFDocument = require("pdfkit");
+const TestLog = require("./models/TestLog"); 
+
 
 const port = 3000;
 
@@ -47,28 +50,49 @@ app.set("view engine", "ejs");
 
 
 //register
+const bcrypt = require('bcrypt');
+
+// GET - Mostrar formulario
 app.get("/register", (req, res) => {
     if (!req.session.user || req.session.user.rol !== 'coordinador') {
         return res.redirect('/');
     }
-    res.render("register", { titulo: "Registrar usuario" });
+
+    res.render("register", { 
+        titulo: "Registrar usuario",
+        error: null // Para mostrar mensajes si los hay
+    });
 });
 
-// Guardar nuevo usuario
+// POST - Guardar usuario
 app.post("/register", async (req, res) => {
     const { nombre, correo, contra, rol } = req.body;
 
+    // Validación de contraseña
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/;
+
+    if (!passwordRegex.test(contra)) {
+        return res.render("register", {
+            titulo: "Registrar usuario",
+            error: "La contraseña debe contener al menos una letra mayúscula, una minúscula y un número."
+        });
+    }
+
     try {
+        const hashedPassword = await bcrypt.hash(contra, 10);
+
         await pool.query(
             "INSERT INTO users (nombre, correo, contra, rol) VALUES (?, ?, ?, ?)",
-            [nombre, correo, contra, rol]
+            [nombre, correo, hashedPassword, rol]
         );
+
         res.redirect("/coordinador");
     } catch (error) {
         console.error("Error al registrar usuario:", error.message);
         res.status(500).send("Error al registrar usuario");
     }
 });
+
 
 // Login
 app.get("/", (req, res) => {
@@ -302,6 +326,44 @@ app.get("/tecnico", async (req, res) => {
       res.status(500).json({ error: "Error del servidor" });
     }
   });
+
+  
+  app.post("/api/tr/:id/completar", async (req, res) => {
+    if (!req.session.user || req.session.user.rol !== 'tecnico') {
+      return res.status(401).json({ error: "No autorizado" });
+    }
+  
+    const trId = req.params.id;
+    const tecnicoId = req.session.user.id;
+    const { resultados } = req.body;
+  
+    if (!Array.isArray(resultados) || resultados.length !== 6 || resultados.some(r => r.trim() === "")) {
+      return res.status(400).json({ error: "Todos los campos deben estar llenos." });
+    }
+  
+    try {
+      const [checkRows] = await pool.query(
+        "SELECT * FROM test_requests WHERE ID = ? AND tecnico_id = ?",
+        [trId, tecnicoId]
+      );
+  
+      if (checkRows.length === 0) {
+        return res.status(404).json({ error: "Solicitud no encontrada o no asignada al técnico." });
+      }
+  
+      // ✅ Actualizar estatus a 'completado'
+      await pool.query(
+        "UPDATE test_requests SET estatus = 'completado' WHERE ID = ?",
+        [trId]
+      );
+  
+      res.json({ message: "Solicitud marcada como completada correctamente." });
+    } catch (error) {
+      console.error("❌ Error al completar solicitud:", error.message);
+      res.status(500).json({ error: "Error en el servidor." });
+    }
+  });
+  
   
 
 // Vista para formulario
@@ -486,9 +548,14 @@ app.post("/coordinador/asignar/:id", async (req, res) => {
     }
 });
 
+const clienteRoutes = require('./routes/cliente');
+app.use(clienteRoutes);
+
+  
+
 
 const tecnicoRoutes = require('./routes/tecnicos');
-app.use(tecnicoRoutes);
+app.use('/tecnico', tecnicoRoutes);
 
 // Página About
 app.get("/about", (req, res) => {
