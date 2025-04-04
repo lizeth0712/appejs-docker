@@ -109,23 +109,51 @@ app.post("/login", async (req, res) => {
 
     try {
         const [rows] = await pool.query(
-            "SELECT * FROM users WHERE correo = ? AND contra = ? AND rol = ?",
-            [username, password, userType]
+            "SELECT * FROM users WHERE correo = ?",
+            [username]
         );
 
         if (rows.length > 0) {
             const user = rows[0];
 
-            req.session.user = {
-                id: user.ID,
-                nombre: user.nombre,
-                rol: user.rol,
-                correo: user.correo
-            };
+            // Si la contraseña no está cifrada la compara directamente
+            if (user.contra === password) {
+                // Si la contraseña es correcta se encripta y actualiza
+                const hashedPassword = await bcrypt.hash(password, 10);
+                await pool.query(
+                    "UPDATE users SET contra = ? WHERE ID = ?",
+                    [hashedPassword, user.ID]
+                );
+                
+                req.session.user = {
+                    id: user.ID,
+                    nombre: user.nombre,
+                    rol: user.rol,
+                    correo: user.correo
+                };
 
-            if (user.rol === 'cliente') return res.redirect('/cliente');
-            if (user.rol === 'coordinador') return res.redirect('/coordinador');
-            if (user.rol === 'tecnico') return res.redirect('/tecnico');
+                if (user.rol === 'cliente') return res.redirect('/cliente');
+                if (user.rol === 'coordinador') return res.redirect('/coordinador');
+                if (user.rol === 'tecnico') return res.redirect('/tecnico');
+            } else {
+                // Si la contraseña está cifrada la compara con bcrypt
+                const passwordMatch = await bcrypt.compare(password, user.contra);
+                if (passwordMatch) {
+                    req.session.user = {
+                        id: user.ID,
+                        nombre: user.nombre,
+                        rol: user.rol,
+                        correo: user.correo
+                    };
+
+                    if (user.rol === 'cliente') return res.redirect('/cliente');
+                    if (user.rol === 'coordinador') return res.redirect('/coordinador');
+                    if (user.rol === 'tecnico') return res.redirect('/tecnico');
+                } else {
+                    req.session.errorLogin = "User or password incorrect";
+                    return res.redirect('/');
+                }
+            }
         } else {
             req.session.errorLogin = "User or password incorrect";
             return res.redirect('/');
@@ -135,6 +163,7 @@ app.post("/login", async (req, res) => {
         res.status(500).send("Error en el servidor");
     }
 });
+
 
 
 // Logout
