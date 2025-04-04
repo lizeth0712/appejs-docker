@@ -89,7 +89,11 @@ app.post("/register", async (req, res) => {
         res.redirect("/coordinador");
     } catch (error) {
         console.error("Error al registrar usuario:", error.message);
-        res.status(500).send("Error al registrar usuario");
+        return res.render("register", {
+            titulo: "Registrar usuario",
+            error: "Ya existe una cuenta con este correo."
+        });
+        
     }
 });
 

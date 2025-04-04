@@ -7,6 +7,7 @@
   <link rel="icon" type="image/png" href="/img/cofilogo.ico">
   
   <title>Cliente</title>
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
   <!-- NAVBAR -->
@@ -71,9 +72,13 @@
         
                   <% if (solicitud.estatus.toLowerCase() === "completado") { %>
                     <a href="/cliente/reporte/<%= solicitud.ID %>">
-                      <button class="download-btn">Download PDF</button>
+                      <button style="background-color: rgba(255, 255, 255, 0); border: 0px;" class="download-btn"><i data-lucide="download"></i></button>
                     </a>
-                  <% } %>
+                  <% } else {%> 
+                    <a >
+                      <button style="background-color: rgba(255, 255, 255, 0); border: 0px; cursor: not-allowed; opacity: 0.5;" class="download-btn"><i data-lucide="download"></i></button>
+                    </a>
+                    <% } %>
                 </td>
               </tr>
             <% }) %>
@@ -87,5 +92,8 @@
       </table>
     </section>
   </div>
+  <script>
+    lucide.createIcons();
+  </script>
 </body>
 </html>
