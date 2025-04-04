@@ -174,6 +174,12 @@ app.get("/logout", (req, res) => {
     });
 });
 
+// About Us
+app.get("/about", (req, res) => {
+    res.render("about", { titulo: "About Us" });
+});
+
+
 // Cliente
 app.get("/cliente", async (req, res) => {
     if (!req.session.user || req.session.user.rol !== 'cliente') {
