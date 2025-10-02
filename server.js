@@ -96,7 +96,11 @@ app.post("/register", async (req, res) => {
         res.redirect("/coordinador");
     } catch (error) {
         console.error("Error al registrar usuario:", error.message);
-        res.status(500).send("Error al registrar usuario");
+        return res.render("register", {
+            titulo: "Registrar usuario",
+            error: "Ya existe una cuenta con este correo."
+        });
+        
     }
 });
 
@@ -115,23 +119,51 @@ app.post("/login", async (req, res) => {
 
     try {
         const [rows] = await pool.query(
-            "SELECT * FROM users WHERE correo = ? AND contra = ? AND rol = ?",
-            [username, password, userType]
+            "SELECT * FROM users WHERE correo = ?",
+            [username]
         );
 
         if (rows.length > 0) {
             const user = rows[0];
 
-            req.session.user = {
-                id: user.ID,
-                nombre: user.nombre,
-                rol: user.rol,
-                correo: user.correo
-            };
+            // Si la contraseña no está cifrada la compara directamente
+            if (user.contra === password) {
+                // Si la contraseña es correcta se encripta y actualiza
+                const hashedPassword = await bcrypt.hash(password, 10);
+                await pool.query(
+                    "UPDATE users SET contra = ? WHERE ID = ?",
+                    [hashedPassword, user.ID]
+                );
+                
+                req.session.user = {
+                    id: user.ID,
+                    nombre: user.nombre,
+                    rol: user.rol,
+                    correo: user.correo
+                };
 
-            if (user.rol === 'cliente') return res.redirect('/cliente');
-            if (user.rol === 'coordinador') return res.redirect('/coordinador');
-            if (user.rol === 'tecnico') return res.redirect('/tecnico');
+                if (user.rol === 'cliente') return res.redirect('/cliente');
+                if (user.rol === 'coordinador') return res.redirect('/coordinador');
+                if (user.rol === 'tecnico') return res.redirect('/tecnico');
+            } else {
+                // Si la contraseña está cifrada la compara con bcrypt
+                const passwordMatch = await bcrypt.compare(password, user.contra);
+                if (passwordMatch) {
+                    req.session.user = {
+                        id: user.ID,
+                        nombre: user.nombre,
+                        rol: user.rol,
+                        correo: user.correo
+                    };
+
+                    if (user.rol === 'cliente') return res.redirect('/cliente');
+                    if (user.rol === 'coordinador') return res.redirect('/coordinador');
+                    if (user.rol === 'tecnico') return res.redirect('/tecnico');
+                } else {
+                    req.session.errorLogin = "User or password incorrect";
+                    return res.redirect('/');
+                }
+            }
         } else {
             req.session.errorLogin = "User or password incorrect";
             return res.redirect('/');
@@ -143,6 +175,7 @@ app.post("/login", async (req, res) => {
 });
 
 
+
 // Logout
 app.get("/logout", (req, res) => {
     req.session.destroy(err => {
@@ -150,6 +183,12 @@ app.get("/logout", (req, res) => {
         res.redirect("/");
     });
 });
+
+// About Us
+app.get("/about", (req, res) => {
+    res.render("about", { titulo: "About Us" });
+});
+
 
 // Cliente
 app.get("/cliente", async (req, res) => {
@@ -502,7 +541,7 @@ app.post("/coordinador/estatus/:id", async (req, res) => {
 
     const solicitudId = req.params.id;
     const nuevoEstatus = req.body.estatus;
-
+    
     try {
 
         await axios.post('http://localhost:5000/notificar_cliente', {
@@ -544,6 +583,7 @@ app.post("/coordinador/asignar/:id", async (req, res) => {
             "UPDATE test_requests SET tecnico_id = ? WHERE ID = ?",
             [tecnicoId, solicitudId]
         );
+        
 
         req.session.mensaje = `✅ Técnico asignado correctamente`;
         res.redirect(`/coordinador?id=${solicitudId}`);

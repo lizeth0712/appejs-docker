@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>About Us - Coficab</title>
+  <link rel="stylesheet" href="/css/about.css">
+  <link rel="icon" type="image/png" href="/img/cofilogo.ico">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+ 
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-dark">
+    <div class="container">
+      <a href="#" class="navbar-brand">
+        <img src="/img/logo.png" alt="Coficab Logo" width="120">
+      </a>
+      <div class="About">
+        <a href="/">Back</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- CONTENT -->
+  <div class="container-about">
+    <h3 class="text-center section-title">About Us</h3>
+
+    <p class="about-text">
+      Since its creation in 1992, <strong>COFICAB</strong> has become a reliable partner for the top automotive wiring harness makers and most of the OEMs. With over <strong>19% of the global market share</strong>, COFICAB is at the forefront of the global megatrends of E-mobility, Connectivity, Autonomous Driving, and Reduction of Weight and Space. We maintain our commitment towards sustainability-driven growth and innovation.
+    </p>
+
+    <hr class="my-5">
+
+    <h4 class="section-title">Contact Us</h4>
+    <p class="section-subtitle">Explore our locations across the Americas</p>
+
+    <!-- LOCATION: USA -->
+    <div class="location-card">
+      <div class="location-header" onclick="toggleInfo('usa-info')">
+        <span><i class="bi bi-geo-alt-fill icon"></i>United States</span>
+        <span class="toggle-sign">−</span>
+      </div>
+      <div class="location-info" id="usa-info">
+        <p>29777 Telegraph Road, Suite 2100, 48034 Southfield, Michigan – USA</p>
+        <p>+1 (915) 920 7593</p>
+        <p>5970 Silver Springs Drive El Paso, TX 79912</p>
+        <p>+1 (915) 920 7593</p>
+      </div>
+    </div>
+
+    <!-- LOCATION: Mexico -->
+    <div class="location-card">
+      <div class="location-header" onclick="toggleInfo('mexico-info')">
+        <span><i class="bi bi-geo-alt-fill icon"></i>Mexico</span>
+        <span class="toggle-sign">+</span>
+      </div>
+      <div class="location-info" id="mexico-info">
+        <p>AV Fidel Velazquez Sanchez 1500 COL 20 de Noviembre 34234 Durango – MEXICO</p>
+        <p>(+52) 618 137 1400</p>
+        <p>Calle Mina de Guadalupe #780 Colonia Parque Industrial Santa Fe IV 36275, Puerto Interior, Silao de la Victoria Guanajuato Leon – MEXICO</p>
+        <p>(+52) 477 162 2535</p>
+        <p>Circuito Intermex Sur 1551 Oriente Parque Industrial Intermex Sur 32575 Cd Juarez, Chihuahua – MEXICO</p>
+        <p>Ave. Del Parque NO. 2100, Airport Technology Park 66650 Pesqueria, Nuevo Leon, México</p>
+      </div>
+    </div>
+
+    <!-- LOCATION: Honduras -->
+    <div class="location-card">
+      <div class="location-header" onclick="toggleInfo('honduras-info')">
+        <span><i class="bi bi-geo-alt-fill icon"></i>Honduras</span>
+        <span class="toggle-sign">+</span>
+      </div>
+      <div class="location-info" id="honduras-info">
+        <p>Green Valley Industrial Park Carretera a Occidente Km. 23, Quimistan – Parcela # 6A – Santa Bárbara – HONDURAS</p>
+        <p>(+504) 2620-3060</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>© 2025 Coficab. All rights reserved.</p>
+  </footer>
+
+  <!-- SCRIPT -->
+  <script>
+    function toggleInfo(id) {
+      const infoDiv = document.getElementById(id);
+      const header = infoDiv.previousElementSibling;
+      const sign = header.querySelector(".toggle-sign");
+
+      if (infoDiv.style.display === "none" || infoDiv.style.display === "") {
+        infoDiv.style.display = "block";
+        sign.textContent = "−";
+      } else {
+        infoDiv.style.display = "none";
+        sign.textContent = "+";
+      }
+    }
+  </script>
+
+</body>
+</html>
