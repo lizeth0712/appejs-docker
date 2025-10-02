@@ -64,7 +64,10 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Who am I in Docker?
-        run: docker info && docker system df && echo "Docker user: $(docker whoami 2>/dev/null || echo unknown)"
+        run: |
+          docker info
+          docker system df 
+          echo "Docker user: $(docker whoami 2>/dev/null || echo unknown)"
 
       # ===== Build APP =====
       - name: Build APP (no push) to capture logs
