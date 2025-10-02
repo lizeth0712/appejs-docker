@@ -25,12 +25,11 @@ jobs:
           cache: "npm"
 
       - name: Install deps
-        run: npm install
+        run: npm ci --ignore-scripts --no-audit --no-fund
 
       - name: Run tests with coverage
-        run: npm test -- --coverage
+        run: npm test -- --coverage --config=jest.config.js
 
-      # Métrica de cobertura en el Job Summary
       - name: Coverage Summary
         uses: irongut/CodeCoverageSummary@v1.3.0
         with:
@@ -39,7 +38,6 @@ jobs:
           format: markdown
           output: both
 
-      # Guarda reportes (para ver/descargar)
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
         with:
@@ -49,7 +47,8 @@ jobs:
   docker:
     name: Build & Push images
     runs-on: ubuntu-latest
-    needs: test     # <- solo si los tests pasan
+    needs: test
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -58,29 +57,55 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Log in to Docker Hub
+        id: login
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # App (Node)
-      - name: Build & Push App
+      - name: Who am I in Docker?
+        run: docker info && docker system df && echo "Docker user: $(docker whoami 2>/dev/null || echo unknown)"
+
+      # ===== Build APP =====
+      - name: Build APP (no push) to capture logs
+        id: build_app
         uses: docker/build-push-action@v6
         with:
           context: .
           file: ./Dockerfile
-          push: true
+          push: false
+          load: false
+          provenance: false
           tags: |
             ${{ env.APP_IMAGE }}:latest
             ${{ env.APP_IMAGE }}:${{ github.sha }}
+          outputs: type=registry
 
-      # Mailer (Flask)
-      - name: Build & Push Mailer
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: ./Dockerfile.flask
-          push: true
-          tags: |
-            ${{ env.MAILER_IMAGE }}:latest
-            ${{ env.MAILER_IMAGE }}:${{ github.sha }}
+      - name: Push APP
+        run: |
+          docker buildx build \
+            --provenance=false \
+            --file ./Dockerfile \
+            --tag $APP_IMAGE:latest \
+            --tag $APP_IMAGE:${GITHUB_SHA} \
+            --push \
+            .
+
+      # ===== Build MAILER =====
+      - name: Build MAILER (push)
+        run: |
+          docker buildx build \
+            --provenance=false \
+            --file ./Dockerfile.flask \
+            --tag $MAILER_IMAGE:latest \
+            --tag $MAILER_IMAGE:${GITHUB_SHA} \
+            --push \
+            .
+
+      # Si falla algo arriba, sube records del build
+      - name: Export build records (if any)
+        if: failure()
+        run: |
+          mkdir -p build-records
+          docker buildx du --verbose || true
+        shell: bash
