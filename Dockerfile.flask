@@ -1,0 +1,7 @@
+FROM python:3.11-slim
+WORKDIR /srv
+COPY Enviar_Correo.py /srv/app.py
+RUN pip install --no-cache-dir flask mysql-connector-python
+ENV FLASK_ENV=production
+EXPOSE 5000
+CMD ["python", "app.py"]

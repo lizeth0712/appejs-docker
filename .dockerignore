@@ -1,0 +1,39 @@
+# Dependencias locales 
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Archivos de logs
+*.log
+
+# Configuración del editor / IDE
+.vscode
+.idea
+.DS_Store
+
+# Git y control de versiones
+.git
+.gitignore
+
+# Archivos de entorno 
+.env
+.env.test
+
+# Resultados de pruebas
+coverage
+test-results
+jest.config.js
+
+# Archivos de pruebas
+test/
+
+# Cachés temporales
+*.swp
+*.swo
+.tmp
+.cache
+
+# Documentos auxiliares
+*.md
+*.pdf
+*.docx

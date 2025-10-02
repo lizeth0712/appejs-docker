@@ -1,0 +1,41 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: appejs-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: lizeth
+      MYSQL_DATABASE: dashboard
+    volumes:
+      - dbdata:/var/lib/mysql
+
+  mailer:
+    build:
+      context: .
+      dockerfile: Dockerfile.flask
+    container_name: appejs-mailer
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:55000:5000" 
+    depends_on:
+      - db
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: appejs-app
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:55080:3000"     
+    env_file:
+      - .env.docker    
+    environment:
+      NODE_ENV: production
+      MAILER_URL: http://mailer:5000
+    depends_on:
+      - db
+      - mailer
+
+volumes:
+  dbdata:

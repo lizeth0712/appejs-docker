@@ -1,3 +1,10 @@
+const app = require('./app');
+const port = process.env.PORT || 3000;
+app.listen(port, () => console.log(`Servidor corriendo en http://localhost:${port}`));
+
+
+
+/*
 // Configuración del servidor
 const express = require("express");
 const app = express();
@@ -101,7 +108,6 @@ app.get("/", (req, res) => {
 
     res.render("login", { titulo: "Inicio de sesión", error });
 });
-
 
 // Ruta para procesar login
 app.post("/login", async (req, res) => {
@@ -569,3 +575,4 @@ app.use((req, res) => {
 app.listen(port, () => {
     console.log(`Servidor corriendo en http://localhost:${port}`);
 });
+*/
