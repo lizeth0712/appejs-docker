@@ -11,8 +11,8 @@ variables:
   # Environment name
   environmentName: 'appliz'
 
-  # Agent pool name (usamos el agente auto-hospedado 'agente-local')
-  agentPoolName: 'agente-local'
+  # Agent pool name (usamos el pool Default)
+  agentPoolName: 'Default'
 
 stages:
 - stage: Build
@@ -21,7 +21,7 @@ stages:
   - job: Build
     displayName: Build
     pool:
-      name: $(agentPoolName)  # Usamos el agente auto-hospedado 'agente-local'
+      name: $(agentPoolName)  # Usamos el agente Default
 
     steps:
     - task: NodeTool@0
@@ -56,7 +56,7 @@ stages:
     displayName: Deploy
     environment: $(environmentName)
     pool:
-      name: $(agentPoolName)  # Usamos el agente auto-hospedado 'agente-local' también para el despliegue
+      name: $(agentPoolName)  # Usamos el agente Default también para el despliegue
     strategy:
       runOnce:
         deploy:
