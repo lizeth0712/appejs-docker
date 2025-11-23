@@ -11,8 +11,8 @@ variables:
   # Environment name
   environmentName: 'appliz'
 
-  # Agent pool name (usamos el pool Default)
-  agentPoolName: 'Default'
+  # Agent VM image name 
+  vmImageName: 'ubuntu-latest'
 
 stages:
 - stage: Build
@@ -20,8 +20,8 @@ stages:
   jobs:
   - job: Build
     displayName: Build
-    pool:
-      name: $(agentPoolName)  # Usamos el agente Default
+    pool: 
+      vmImage: $(vmImageName)
 
     steps:
     - task: NodeTool@0
