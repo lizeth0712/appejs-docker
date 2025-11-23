@@ -12,7 +12,7 @@ variables:
   environmentName: 'appliz'
 
   # Agent pool name (usamos el pool Default)
-  agentPoolName: 'Default'
+  agentPoolName: 'default'
 
 stages:
 - stage: Build
